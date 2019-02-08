@@ -1,5 +1,7 @@
 const express = require('express');
 
+const db = require('./data/dbConfig');
+
 const server = express();
 
 server.use(express.json());
@@ -8,13 +10,19 @@ server.get('/', (req, res) => {
   res.status(200).json({ api: 'up' });
 });
 
-server.post('/users', (req, res) => {
-  const user = { id: '1', name: 'Jesse' };
-  const insert = item => {
-    localStorage.setItem('1', item);
-  };
+server.get('/users', async (req, res) => {
+  const response = await db('users');
+  res.status(200).json(response);
+});
 
-  insert(user).then(res.status(201).json(user));
+server.post('/users', async (req, res) => {
+  const user = req.body;
+  if (user.name) {
+    const response = await db('users').insert(user);
+    res.status(201).json(response);
+  } else {
+    res.status(400).json({ error: 'Please enter user data' });
+  }
 });
 
 module.exports = server;

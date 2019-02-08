@@ -1,9 +1,13 @@
 const request = require('supertest');
 
 const server = require('./server');
+const db = require('./data/dbConfig');
 
 describe('the route handlers', () => {
   describe('post /users', () => {
+    afterEach(async () => {
+      await db('users').truncate();
+    });
     test('responds with 201 status', async () => {
       const user = { id: '1', name: 'Jesse' };
       const response = await request(server)
